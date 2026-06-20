@@ -40,8 +40,15 @@
 
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
+  html, body {
+    height: 100%;
+    overflow: hidden;
+    position: fixed;
+    width: 100%;
+  }
+
   body {
-    min-height: 100vh;
+    height: 100%;
     background-color: #ede8dc;
     font-family: 'SUITE', sans-serif;
     display: flex;
@@ -49,6 +56,8 @@
     align-items: center;
     padding: 40px 12px 40px;
     -webkit-tap-highlight-color: transparent;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
   }
 
   /* Header */
