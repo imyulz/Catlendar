@@ -40,11 +40,9 @@
 
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-  html, body {
+  html {
     height: 100%;
     overflow: hidden;
-    position: fixed;
-    width: 100%;
   }
 
   body {
@@ -58,6 +56,7 @@
     -webkit-tap-highlight-color: transparent;
     overflow-y: auto;
     -webkit-overflow-scrolling: touch;
+    overscroll-behavior: none;
   }
 
   /* Header */
