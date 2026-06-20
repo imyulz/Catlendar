@@ -429,14 +429,16 @@
   .dday-text {
     font-size: 13px;
     color: #7a6050;
+    font-family: 'YunManseh', sans-serif;
     display: inline-flex;
     align-items: baseline;
-    gap: 8px;
+    gap: 12px;
   }
   .dday-text b {
     color: #5c4a32;
-    font-size: 16px;
-    font-weight: 400;
+    font-size: 13px;
+    font-weight: 700;
+    font-family: 'YunManseh', sans-serif;
   }
 </style>
 </head>
@@ -1031,8 +1033,8 @@ function calcDday(dateStr) {
   return diffDays;
 }
 function renderDday() {
-  document.getElementById('ddayBirth').textContent = calcDday('2023-04-06') + '일';
-  document.getElementById('ddayAdopt').textContent = calcDday('2026-05-29') + '일';
+  document.getElementById('ddayBirth').textContent = calcDday('2023-04-06').toLocaleString('ko-KR') + '일';
+  document.getElementById('ddayAdopt').textContent = calcDday('2026-05-29').toLocaleString('ko-KR') + '일';
 }
 renderDday();
 
