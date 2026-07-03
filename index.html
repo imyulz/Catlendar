@@ -134,7 +134,7 @@
     display: grid;
     grid-template-columns: repeat(7, 1fr);
     padding: 4px 8px 16px;
-    gap: 2px;
+    gap: 0;
   }
   .cal-cell {
     min-height: 52px;
@@ -449,34 +449,45 @@
     font-family: 'BaskinRobbinsKR', sans-serif;
   }
 
-  /* 집사없는날 하이라이트 (연속 구간은 box-shadow로 이어붙임) */
+  /* 집사없는날 — 날짜 숫자 위치에 브라운 띠 배경 */
   .cal-cell.absence {
-    background: #f5c0b8 !important;
-    border-radius: 0 !important;
+    background: transparent !important;
     position: relative;
-    box-shadow: -2px 0 0 #f5c0b8, 2px 0 0 #f5c0b8;
   }
-  .cal-cell.absence.absence-start {
-    border-top-left-radius: 10px !important;
-    border-bottom-left-radius: 10px !important;
-    box-shadow: 2px 0 0 #f5c0b8;
+  /* 날짜 숫자 높이만큼 띠를 ::before로 그림 */
+  .cal-cell.absence::before {
+    content: '';
+    position: absolute;
+    top: 3px;
+    left: 0;
+    right: 0;
+    height: 22px;
+    background: rgba(184,144,106,0.25);
+    border-radius: 0;
+    z-index: 0;
   }
-  .cal-cell.absence.absence-end {
-    border-top-right-radius: 10px !important;
-    border-bottom-right-radius: 10px !important;
-    box-shadow: -2px 0 0 #f5c0b8;
+  .cal-cell.absence.absence-start::before {
+    left: 2px;
+    border-top-left-radius: 6px;
+    border-bottom-left-radius: 6px;
   }
-  .cal-cell.absence.absence-start.absence-end {
-    box-shadow: none;
+  .cal-cell.absence.absence-end::before {
+    right: 2px;
+    border-top-right-radius: 6px;
+    border-bottom-right-radius: 6px;
   }
-  .cal-cell.absence .day-num,
-  .cal-cell.absence .day-num.sun,
-  .cal-cell.absence .day-num.sat {
-    color: #8a3025 !important;
+  .cal-cell.absence.absence-start.absence-end::before {
+    left: 2px;
+    right: 2px;
+    border-radius: 6px;
+  }
+  .cal-cell.absence .day-num {
+    position: relative;
+    z-index: 1;
   }
   .btn-absence {
-    background: #f0c8b8;
-    color: #8a4030;
+    background: #e8dcc8;
+    color: #7a5c3a;
     border: none;
     border-radius: 10px;
     padding: 4px 10px;
@@ -485,7 +496,7 @@
     font-family: inherit;
   }
   .btn-absence.active {
-    background: #e08868;
+    background: #b8906a;
     color: #fff;
   }
 </style>
