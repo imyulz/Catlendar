@@ -448,6 +448,46 @@
     font-weight: 400;
     font-family: 'BaskinRobbinsKR', sans-serif;
   }
+
+  /* 집사없는날 하이라이트 (연속 구간은 box-shadow로 이어붙임) */
+  .cal-cell.absence {
+    background: #f5c0b8 !important;
+    border-radius: 0 !important;
+    position: relative;
+    box-shadow: -2px 0 0 #f5c0b8, 2px 0 0 #f5c0b8;
+  }
+  .cal-cell.absence.absence-start {
+    border-top-left-radius: 10px !important;
+    border-bottom-left-radius: 10px !important;
+    box-shadow: 2px 0 0 #f5c0b8;
+  }
+  .cal-cell.absence.absence-end {
+    border-top-right-radius: 10px !important;
+    border-bottom-right-radius: 10px !important;
+    box-shadow: -2px 0 0 #f5c0b8;
+  }
+  .cal-cell.absence.absence-start.absence-end {
+    box-shadow: none;
+  }
+  .cal-cell.absence .day-num,
+  .cal-cell.absence .day-num.sun,
+  .cal-cell.absence .day-num.sat {
+    color: #8a3025 !important;
+  }
+  .btn-absence {
+    background: #f0c8b8;
+    color: #8a4030;
+    border: none;
+    border-radius: 10px;
+    padding: 4px 10px;
+    font-size: 13px;
+    cursor: pointer;
+    font-family: inherit;
+  }
+  .btn-absence.active {
+    background: #e08868;
+    color: #fff;
+  }
 </style>
 </head>
 <body>
@@ -562,6 +602,7 @@
         <div class="modal-date-main" id="modalDateMain"></div>
       </div>
       <div class="modal-actions">
+        <button class="btn-absence" id="btnAbsence" onclick="toggleAbsence()">집사없어</button>
         <button class="btn-edit" id="btnEdit" style="display:none">수정</button>
         <button class="btn-save-top" id="btnSaveTop" style="display:none">저장</button>
         <button class="btn-close" id="btnClose">✕</button>
@@ -642,6 +683,12 @@ const today = new Date();
 let curYear = today.getFullYear(), curMonth = today.getMonth();
 let records = {};
 try { const s = localStorage.getItem('kanchoRecords'); if (s) records = JSON.parse(s); } catch(e) {}
+
+let absenceDates = {};
+try { const sa = localStorage.getItem('kanchoAbsence'); if (sa) absenceDates = JSON.parse(sa); } catch(e) {}
+function saveAbsence() {
+  try { localStorage.setItem('kanchoAbsence', JSON.stringify(absenceDates)); } catch(e) {}
+}
 let selKey = null, editMode = false, editData = null;
 
 function recKey(y, m, d) { return `${y}-${String(m+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`; }
@@ -666,6 +713,19 @@ function renderCal() {
 
     if (valid) {
       const k = recKey(curYear, curMonth, d);
+
+      // 집사없는날 하이라이트 (같은 주 내 연속 구간 표시)
+      if (absenceDates[k]) {
+        cell.classList.add('absence');
+        const prevKey = d > 1 ? recKey(curYear, curMonth, d-1) : null;
+        const nextKey = d < daysInMonth ? recKey(curYear, curMonth, d+1) : null;
+        const isWeekStart = dow === 0;
+        const isWeekEnd = dow === 6;
+        const prevInRange = prevKey && absenceDates[prevKey] && !isWeekStart;
+        const nextInRange = nextKey && absenceDates[nextKey] && !isWeekEnd;
+        if (!prevInRange) cell.classList.add('absence-start');
+        if (!nextInRange) cell.classList.add('absence-end');
+      }
       const numEl = document.createElement('span');
       numEl.className = 'day-num' + (dow===0?' sun':dow===6?' sat':'') + (isToday?' today-num':'');
       if (isToday) numEl.classList.add('day-num-today');
@@ -792,10 +852,29 @@ btnEdit.onclick = () => {
   renderModal(d);
 };
 
+
+function toggleAbsence() {
+  if (absenceDates[selKey]) {
+    delete absenceDates[selKey];
+  } else {
+    absenceDates[selKey] = true;
+  }
+  saveAbsence();
+  renderCal();
+  const d = parseInt(document.getElementById('modalDateMain').textContent);
+  updateAbsenceBtn(d);
+}
+function updateAbsenceBtn(d) {
+  const btn = document.getElementById('btnAbsence');
+  const k = recKey(curYear, curMonth, d);
+  if (absenceDates[k]) btn.classList.add('active');
+  else btn.classList.remove('active');
+}
 function renderModal(d) {
   const dow = new Date(curYear, curMonth, d).getDay();
   document.getElementById('modalDateSub').textContent = `${curYear}년 ${monthNames[curMonth]}`;
   document.getElementById('modalDateMain').textContent = `${d}일 ${dayNames[dow]}요일`;
+  updateAbsenceBtn(d);
 
   const btnSaveTop = document.getElementById('btnSaveTop');
   if (editMode) {
